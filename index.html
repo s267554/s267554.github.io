@@ -2,9 +2,200 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Rebus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tante angurie presse!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .word-container {
+            display: none;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 400px;
+            padding: 10px;
+        }
+        .word-container.active {
+            display: block;
+        }
+        .image-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            width: 100%;
+        }
+        .image-group img {
+            max-width: 100%;
+            height: auto;
+        }
+        .hint-buttons {
+            margin-top: 10px;
+        }
+        .hint-buttons button {
+            margin: 5px;
+        }
+        .hint-box {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #000;
+            min-height: 30px;
+            background: #f9f9f9;
+        }
+        .solution-box {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #000;
+            background: #e9f9e9;
+            min-height: 30px;
+        }
+        .easter-egg {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.2em;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <img src="rebus.svg" style="width: 100%; height: auto;">
+    <div id="rebus-container"></div>
+    <button id="prev">Precedente</button>
+    <button id="next">Successivo</button>
+    <div class="easter-egg" onclick="alert('mandami un sms con scritto topolona per ricevere un favoloso premio monetario!!!')">Cliccami</div>
+    
+    <script>
+        const rebusData = [
+            {
+                wordLength: "2",
+                images: ["parola1.jpg",],
+                hints: ["sigla in inglese, partiamo male eh?"],
+                solution: "un"
+            },
+            {
+                wordLength: "7",
+                images: ["parola2.png"],
+                hints: ["dai questa è facile", "dove???"],
+                solution: "tributo"
+            },
+            {
+                wordLength: "11",
+                images: ["parola3.png"],
+                hints: ["il ", "grazie silvio", "no comment"],
+                solution: "posticipato"
+            },
+            {
+                wordLength: "2 6",
+                images: ["parola4.png"],
+                hints: ["da vocabolario", "togli due lettere........."],
+                solution: "al vostro"
+            },
+            {
+                wordLength: "13",
+                images: ["parola5.png"],
+                hints: ["questo personaggio della zanzara di si fa di ", "una cosa 'poco' british", "verbo prima persona"],
+                solution: "trentaduesimo"
+            },
+            {
+                wordLength: "9",
+                images: ["parola6.png"],
+                hints: ["seriamente?", "altro verbo in prima persona"],
+                solution: "traguardo"
+            },
+            {
+                wordLength: "4 1 7 (4-2-2-2 con lo spelling) ma scrivetelo normale in soluzione",
+                images: ["parola7.png"],
+                hints: ["vabbè", "miao", "alla peggio usate l'app fotocamera del vostro smartphone"],
+                solution: "da me e chatgpt"
+            }
+        ];
+        
+        const container = document.getElementById("rebus-container");
+        let currentIndex = 0;
+        
+        function renderRebus() {
+            container.innerHTML = "";
+            rebusData.forEach((word, index) => {
+                const wordDiv = document.createElement("div");
+                wordDiv.className = "word-container";
+                if (index === currentIndex) wordDiv.classList.add("active");
+                
+                const imgGroup = document.createElement("div");
+                imgGroup.className = "image-group";
+                word.images.forEach((imgSrc) => {
+                    const img = document.createElement("img");
+                    img.src = imgSrc;
+                    imgGroup.appendChild(img);
+                });
+                
+                const hintButtons = document.createElement("div");
+                hintButtons.className = "hint-buttons";
+                const hintBox = document.createElement("div");
+                hintBox.className = "hint-box";
+                hintBox.textContent = "Suggerimenti: Seleziona un suggerimento.";
+                
+                word.hints.forEach((hint, hintIndex) => {
+                    const hintBtn = document.createElement("button");
+                    hintBtn.textContent = `Suggerimento ${hintIndex + 1}`;
+                    hintBtn.onclick = () => {
+                        hintBox.textContent = `Suggerimento: ${hint}`;
+                    };
+                    hintButtons.appendChild(hintBtn);
+                });
+                
+                const lengthInfo = document.createElement("p");
+                lengthInfo.textContent = `Lunghezza parola: ${word.wordLength}`;
+                
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Inserisci soluzione";
+                
+                const checkBtn = document.createElement("button");
+                checkBtn.textContent = "Prova soluzione";
+                
+                const solutionBox = document.createElement("div");
+                solutionBox.className = "solution-box";
+                solutionBox.textContent = "Verifica la tua risposta.";
+                
+                checkBtn.onclick = () => {
+                    if (input.value.toLowerCase() === word.solution.toLowerCase()) {
+                        solutionBox.textContent = "Corretto!";
+                        solutionBox.style.background = "#c8f7c5";
+                    } else {
+                        solutionBox.textContent = "Sbagliato, riprova.";
+                        solutionBox.style.background = "#f7c5c5";
+                    }
+                };
+                
+                wordDiv.appendChild(imgGroup);
+                wordDiv.appendChild(hintButtons);
+                wordDiv.appendChild(hintBox);
+                wordDiv.appendChild(lengthInfo);
+                wordDiv.appendChild(input);
+                wordDiv.appendChild(checkBtn);
+                wordDiv.appendChild(solutionBox);
+                container.appendChild(wordDiv);
+            });
+        }
+        
+        document.getElementById("prev").onclick = function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderRebus();
+            }
+        };
+        
+        document.getElementById("next").onclick = function() {
+            if (currentIndex < rebusData.length - 1) {
+                currentIndex++;
+                renderRebus();
+            }
+        };
+        
+        renderRebus();
+    </script>
 </body>
 </html>
